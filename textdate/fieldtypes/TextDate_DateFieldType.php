@@ -35,37 +35,42 @@ class TextDate_DateFieldType extends BaseFieldType
         return array(AttributeType::String, 'column' => ColumnType::Varchar, 'maxLength' => 8);
     }
 
-    public function getInputHtml($name, $value)
+    public function prepValue($value)
     {
-        // Reformat input name as an ID
-        $id = craft()->templates->formatInputId($name);
-
-        // Get final namespaced ID so we can select it with JQuery
-        $namespacedId = craft()->templates->namespaceInputId($id);
-
-        $separator = $this->getSettings()->separator;
-
-        // Get date pieces from existing value if it exists
+        // fetch existing date value from the DB and prep it for the input field
         if (!empty($value)) {
-            $isoDate = $this->prepValueFromPost($value);
-            $year = substr($isoDate, 0, 4);
-            $month = substr($isoDate, 4, 2);
-            $day = substr($isoDate, 6, 2);
+            $year = substr($value, 0, 4);
+            $month = substr($value, 4, 2);
+            $day = substr($value, 6, 2);
+            $separator = $this->getSettings()->separator;
+            if ($this->getSettings()->dateOrder === "YYYYMMDD") {
+                $value = (!empty($value) ? $year.$separator.$month.$separator.$day : '');
+            } elseif ($this->getSettings()->dateOrder === "DDMMYYYY") {
+                $value = (!empty($value) ? $day.$separator.$month.$separator.$year : '');
+            } else { // MMDDYYYY
+                $value = (!empty($value) ? $month.$separator.$day.$separator.$year : '');
+            }
         }
 
-        // Put together masks for input
+        return $value;
+    }
+
+    public function getInputHtml($name, $value)
+    {
+        $id = craft()->templates->formatInputId($name); // Reformat input name as an ID
+        $namespacedId = craft()->templates->namespaceInputId($id); // Get namespaced ID so we can select it with JQuery
+        $separator = $this->getSettings()->separator;
+
+        // prep input mask if needed
         $jsMask = '99'.$separator.'99'.$separator.'9999'; // Default mask
 
         if ($this->getSettings()->dateOrder === "YYYYMMDD") {
             $placeholderText = 'YYYY'.$separator.'MM'.$separator.'DD';
             $jsMask = '9999'.$separator.'99'.$separator.'99'; // Mask is different for ISO 8601
-            $value = (!empty($value) ? $year.$separator.$month.$separator.$day : '');
         } elseif ($this->getSettings()->dateOrder === "DDMMYYYY") {
             $placeholderText = 'DD'.$separator.'MM'.$separator.'YYYY';
-            $value = (!empty($value) ? $day.$separator.$month.$separator.$year : '');
         } else { // MMDDYYYY
             $placeholderText = 'MM'.$separator.'DD'.$separator.'YYYY';
-            $value = (!empty($value) ? $month.$separator.$day.$separator.$year : '');
         }
 
         // Add a jQuery input mask only if a mask separator is set
@@ -106,7 +111,7 @@ class TextDate_DateFieldType extends BaseFieldType
         $dateOrder = $this->getSettings()->dateOrder;
         $find = array($this->getSettings()->separator, ' ');
         $replace = array('', '9');
-        $strippedVal = str_replace($find, $replace, $value); // remove separator and replace spaces with 0s
+        $strippedVal = str_replace($find, $replace, $value); // remove separator and replace spaces with 9s
 
         if ($dateOrder === 'YYYYMMDD') {
             $year = substr($strippedVal, 0, 4);
