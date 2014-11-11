@@ -1,0 +1,19 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.radioGroupField({
+    label: "Date Order"|t,
+    instructions: "Order of date input. This is strictly a data entry preference and has no impact on how the value is actually saved."|t,
+    id: 'dateOrder',
+    name: 'dateOrder',
+    options: options,
+    value: dateOrder
+}) }}
+
+{{ forms.textField({
+    label: "Mask Separator"|t,
+    instructions: "Character used to separate year, month, and day values (optional)"|t,
+    id: 'separator',
+    name: 'separator',
+    value: separatorValue,
+    maxlength: 1
+}) }}
