@@ -10,7 +10,7 @@ class TextDatePlugin extends BasePlugin
 
     function getVersion()
     {
-        return '1.02';
+        return '1.03';
     }
 
     function getDeveloper()
