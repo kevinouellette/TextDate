@@ -16,7 +16,7 @@ When creating a new Text Date field, be sure to select your preferred date order
 
 While entering dates, you can leave out unknown segments by replacing them with 9s (ex., 2015-02-99 for an unknown day in February 2015 or 2015-99-99 when you only know the year).
 
-Text Date values are saved to the database using the VARCHAR(8) data type instead of DATETIME. Because of this, Twig's standard date formatting filter won't work. A textdate filter has been included to handle ISO 8601 date strings.
+Twig's standard date formatting filter won't work with incomplete values, so a textdate filter has been included to handle ISO 8601-formatted date strings.
 
 To output a field which may or may not have incomplete values in it, you can specify up to 3 fallback formatting options:
 
