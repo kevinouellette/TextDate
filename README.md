@@ -28,10 +28,10 @@ The filter cycles through your formatting options in order until it finds one it
 
 Here are some expected results from the tag above:
 
-* 2015-02-23 = February 23, 2015
-* 2015-02-99 = February 2015
-* 9999-02-23 = February 23
-* 2015-99-23 = 2015
-* 9999-99-23 = 
+* 20150223 = February 23, 2015
+* 20150299 = February 2015
+* 99990223 = February 23
+* 20159923 = 2015
+* 99999923 = 
 
 *Note: Due to the way partial dates are processed, the unlikely scenario of outputting multiple variations of the same date segment won't work in a fallback.*
