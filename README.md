@@ -18,7 +18,7 @@ While entering dates, you can leave out unknown segments by replacing them with 
 
 Twig's standard date formatting filter won't work with incomplete values, so a textdate filter has been included to handle ISO 8601-formatted date strings.
 
-To output a field which may or may not have incomplete values in it, you can specify up to 3 fallback formatting options:
+To output a field which may or may not have incomplete values in it, you can specify up to 3 fallback formatting options such as:
 
 ```
 {{ entry.myField|textdate('F j, Y', 'F Y', 'F j', 'Y') }}
