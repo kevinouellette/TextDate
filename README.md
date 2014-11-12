@@ -21,7 +21,7 @@ Text Date values are saved to the database using the VARCHAR(8) data type instea
 To output a field which may or may not have incomplete values in it, you can specify up to 3 fallback formatting options:
 
 ```
-{{ myField|textdate('F j, Y', 'F Y', 'F j', 'Y') }}
+{{ entry.myField|textdate('F j, Y', 'F Y', 'F j', 'Y') }}
 ```
 
 The filter cycles through your formatting options in order until it finds one it can use. If it doesn't have enough date information to use any of them, a blank string is returned.
