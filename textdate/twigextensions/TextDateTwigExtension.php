@@ -36,6 +36,49 @@ class TextDateTwigExtension extends \Twig_Extension
         return false;
     }
 
+    // replace individual formatting options. yuck.
+    function getReturnDate($fallback, $yearNum, $monthNum, $dayNum, $dayUsable, $monthUsable, $yearUsable)
+    {
+        $returnDate = $fallback;
+
+        // we have to go through each option separately to prevent erroneous replacements (the 'y' in May, etc.)
+        // because of this, the unlikely scenario of multiple formattings of the same date segment won't work
+
+        if ($dayUsable === true) {
+            if (strpos($fallback, 'd') !== false) {
+                $returnDate = str_replace('d', $dayNum, $returnDate);
+            } elseif (strpos($fallback, 'j') !== false) {
+                $returnDate = str_replace('j', ltrim($dayNum, '0'), $returnDate);
+            }
+        }
+
+        if ($monthUsable === true) {
+            if (strpos($returnDate, 'F') !== false) {
+                $returnDate = str_replace('F', date('F', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            } elseif (strpos($returnDate, 'm') !== false) {
+                $returnDate = str_replace('m', date('m', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            } elseif (strpos($returnDate, 'M') !== false) {
+                $returnDate = str_replace('M', date('M', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            } elseif (strpos($returnDate, 'n') !== false) {
+                $returnDate = str_replace('n', date('n', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            } elseif (strpos($returnDate, 't') !== false) {
+                $returnDate = str_replace('t', date('t', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            } elseif (strpos($returnDate, 'N') !== false) {
+                $returnDate = str_replace('N', date('N', mktime(0, 0, 0, $monthNum, 10)), $returnDate);
+            }
+        }
+
+        if ($yearUsable === true) {
+            if (strpos($fallback, 'Y') !== false) { 
+                $returnDate = str_replace('Y', $yearNum, $returnDate);
+            } elseif (strpos($fallback, 'y') !== false) { 
+                $returnDate = str_replace('y', substr($yearNum, 2, 2), $returnDate);
+            }
+        }
+
+        return $returnDate;
+    }
+
     public function textdate($isoDate, $format, $fallback = "", $fallback2 = "", $fallback3 = "")
     {
         $returnDate = $yearNum = $monthNum = $dayNum = "";
@@ -50,33 +93,40 @@ class TextDateTwigExtension extends \Twig_Extension
                 $d = strtotime($isoDate);
                 $returnDate = date($format, $d);
             } else {
-                // fill an array with all unusable format values
-                $missing = array('W');
-                if ($yearNum === '9999') {
-                    array_push($missing, 'Y', 'y');
-                }
+                if (empty($fallback)) return ''; // if there's no fallback set, we can't return a value
 
-                if ($monthNum === '99') {
-                    array_push($missing, 'F', 'm', 'M', 'n', 't');
-                }
+                // fill an array with all unusable date-specific format values
+                $missing = array('W', 'l', 'z', 'w', 'D', 'N', 'S');
 
                 if ($dayNum === '99') {
-                    array_push($missing, 'd', 'D', 'j', 'l', 'N', 'S', 'w', 'z', 'W');
+                    array_push($missing, 'd', 'j');
+                    $dayUsable = false;
+                } else {
+                    $dayUsable = true;
+                }
+                if ($monthNum === '99') {
+                    array_push($missing, 'F', 'm', 'M', 'n', 't', 'N');
+                    $monthUsable = false;
+                } else {
+                    $monthUsable = true;
+                }
+                if ($yearNum === '9999') { 
+                    array_push($missing, 'Y', 'y');
+                    $yearUsable = false;
+                } else {
+                    $yearUsable = true;
                 }
 
                 // check date format fallbacks. if nothing works, return empty string.
                 if ($this->strposa($fallback, $missing) === false) {
                     // first fallback is safe. we can send back a date.
-                    $d = strtotime(str_replace('99', '00', $isoDate));
-                    $returnDate = date($fallback, $d);
-                } elseif ($this->strposa($fallback2, $missing) === false) {
+                    $returnDate = $this->getReturnDate($fallback, $yearNum, $monthNum, $dayNum, $dayUsable, $monthUsable, $yearUsable);
+                } elseif (!empty($fallback2) && $this->strposa($fallback2, $missing) === false) {
                     // second fallback is safe.
-                    $d = strtotime(str_replace('99', '00', $isoDate));
-                    $returnDate = date($fallback2, $d);
-                } elseif ($this->strposa($fallback3, $missing) === false) {
+                    $returnDate = $this->getReturnDate($fallback2, $yearNum, $monthNum, $dayNum, $dayUsable, $monthUsable, $yearUsable);
+                } elseif (!empty($fallback3) && $this->strposa($fallback3, $missing) === false) {
                     // third fallback is safe.
-                    $d = strtotime(str_replace('99', '00', $isoDate));
-                    $returnDate = date($fallback3, $d);
+                    $returnDate = $this->getReturnDate($fallback3, $yearNum, $monthNum, $dayNum, $dayUsable, $monthUsable, $yearUsable);
                 }
             }
         }
