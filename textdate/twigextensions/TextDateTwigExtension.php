@@ -84,6 +84,8 @@ class TextDateTwigExtension extends \Twig_Extension
         $returnDate = $yearNum = $monthNum = $dayNum = "";
 
         if (!empty($isoDate)) {
+            $isoDate = str_replace('-', '', $isoDate); // ISO 8601 date values sometimes have dashes
+
             // Split date value into its individual parts
             $yearNum = substr($isoDate, 0, 4);
             $monthNum = substr($isoDate, 4, 2);
