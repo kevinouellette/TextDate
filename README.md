@@ -4,7 +4,7 @@ This plugin adds a Text Date field to Craft with an optional input mask and supp
 
 ## Features
 * Choose your own separator character in the settings, or leave it blank to turn off the mask
-* Support for incomplete date values.
+* Partial support for incomplete date values.
 * A textdate Twig filter is included as a replacement for the standard date filter.
 
 ## Installation
@@ -33,3 +33,5 @@ Here are some expected results from the tag above:
 * 9999-02-23 = February 23
 * 2015-99-23 = 2015
 * 9999-99-99 = 
+
+*Note: Due to the way partial dates are processed, the unlikely scenario of outputting multiple variations of the same date segment won't work in a fallback.*
