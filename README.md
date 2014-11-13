@@ -34,4 +34,5 @@ Here are some expected results from the tag above:
 * 20159923 = 2015
 * 99999923 = 
 
-*Note: Due to the way partial dates are processed, the unlikely scenario of outputting multiple variations of the same date segment won't work in a fallback.*
+## Additional notes
+* Due to the way partial dates are processed, using multiple variations of the same date segment won't work in a fallback. This will probably be fixed eventually, but it's low priority.
