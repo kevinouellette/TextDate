@@ -36,3 +36,4 @@ Here are some expected results from the tag above:
 
 ## Additional notes
 * Due to the way partial dates are processed, using multiple variations of the same date segment won't work in a fallback. This will probably be fixed eventually, but it's low priority.
+* All date values are stored to the database in a VARCHAR(8) column using the format YYYYMMDD. This is the best format for sorting purposes, which is also the reason 9 is used for missing values instead of 0.
